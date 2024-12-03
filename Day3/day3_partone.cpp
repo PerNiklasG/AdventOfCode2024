@@ -28,8 +28,8 @@ int main() {
         std::cout << "Second number (match[2]): " << match[2].str() << '\n';
         std::cout << "Full match: " << match.str() << std::endl;
 
-        int num1 = std::stoi(match[1].str());  // First number
-        int num2 = std::stoi(match[2].str());  // Second number
+        int num1 = std::stoi(match[1].str());
+        int num2 = std::stoi(match[2].str());
         int product = num1 * num2;   
         totalSum += product;
     }
