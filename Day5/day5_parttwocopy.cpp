@@ -1,10 +1,28 @@
 #include <iostream>
 #include <fstream>
-#include <set>
-#include <string>
 #include <vector>
+#include <string>
 #include <sstream>
+#include <unordered_map>
+#include <algorithm>
+#include <map>
+#include <set>
 
+bool findInSet(const std::unordered_map<int, std::set<int>> pairsMap, int key, int number) {
+    auto it = pairsMap.find(key);
+    if (it == pairsMap.end()) {
+        return false;
+    }
+
+    const std::set<int>&numberSet = it-> second;
+
+    auto setIt = numberSet.find(number);
+    if(setIt != numberSet.end()) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 int main() {
     std::ifstream inputFile("input.txt");
@@ -13,60 +31,67 @@ int main() {
         return 1;
     }
 
-    std::set<std::pair<int,int>> st;
+    std::set<std::pair<int, int>> pairsSet;
+    std::vector<std::vector<int>> validRows, invalidRows;
     std::string line;
 
-    while(std::getline(inputFile, line)) {
-        if(line.empty() || !isdigit(line[0])) {
-            break;
+    while(std::getline(inputFile, line) && !line.empty()){
+        std::stringstream ss(line);
+        std::string left, right;
+        if(std::getline(ss, left, '|') && std::getline(ss,right)) {
+            int first = std::stoi(left);
+            int second = std::stoi(right);
+            pairsSet.insert({first, second});
         }
-
-        int pipe = static_cast<int>(line.find('|'));
-
-        int x = std::stoi(line.substr(0, pipe));
-        int y = std::stoi(line.substr(pipe + 1));
-        st.insert({x,y});
     }
 
-    int ans = 0;
-    while(std::getline(inputFile, line)) {
-        std::stringstream ss(line);
-        std::string tmp;
-        std::vector<int> pages;
+    std::cout << "PairsMap contents:\n";
+    for (const auto& pair : pairsSet) {
+        std::cout << "(" << pair.first << "," << pair.second << ")" << std::endl;
+    }
+    std::cout << "\n";
 
-        while(std::getline(ss, tmp, ',')) {
-            pages.push_back(std::stoi(tmp));
+    int sum = 0;
+    while (std::getline(inputFile, line)) {
+        if(line.empty()) continue;
+
+        std::stringstream ss(line);
+        std::string number;
+        std::vector<int> row;
+        
+        while (std::getline(ss,number,',')) {
+            row.push_back(std::stoi(number));
         }
 
-        int n = static_cast<int>(pages.size());
-
-
         bool ok = true;
-
-        for(int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                if(st.find({pages[j], pages[i]}) != st.end()) {
+        for (int i = 0; i < row.size(); i++) {
+            for(int j = i + 1; j < row.size(); j++) {
+                if(pairsSet.find({row[j], row[i]}) != pairsSet.end()) {
                     ok = false;
                     break;
                 }
             }
         }
+
         if(!ok) {
             while(!ok) {
                 ok = true;
-                for(int i = 0; i < n; i++) {
-                    for(int j = i + 1; j < n; j++) {
-                        if(st.find({pages[j], pages[i]}) != st.end()) {
+                for(int i = 0; i < row.size(); i++) {
+                    for(int j = i + 1; j < row.size(); j++) {
+                        if(pairsSet.find({row[j], row[i]}) != pairsSet.end()) {
                             ok = false;
-                            std::swap(pages[i], pages[j]);
+                            std::swap(row[i], row[j]);
                         }
                     }
                 }
-            }   
-            ans += pages[n / 2]; 
-        }
-    }  
-    std::cout << "Sum: " << ans << std::endl;
+            }
+            sum += row[row.size() / 2];
+        }   
+    }
+    inputFile.close();
+
+
+    std::cout << "Sum: " << sum << std::endl;
 
     return 0;
 }
