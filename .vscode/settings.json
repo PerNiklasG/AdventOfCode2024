@@ -70,6 +70,7 @@
         "unordered_set": "cpp",
         "set": "cpp",
         "map": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "numeric": "cpp"
     }
 }
